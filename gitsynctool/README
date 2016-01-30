@@ -1,0 +1,10 @@
+在Windows上修改代码，可以一键式修改Linux上的代码测试
+
+前提条件：
+1，在Windows上安装python2.7
+2，在Windows上安装dos2unix工具
+3，在Windows上安装git工具
+
+gitsync.py可以把Windows上的代码修改一键式同步到Linux上
+
+gitrestore.py 可以在linux上一键式回复所有git修改
