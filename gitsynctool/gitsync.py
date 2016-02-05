@@ -3,6 +3,7 @@ import os
 import socket
 import sys
 from subprocess import Popen, PIPE
+import ctypes
 
 HOST = '10.113.171.161'
 PORT = 2121
@@ -14,6 +15,31 @@ REMOTE_BASE_DIR = '/home1/irteam/Code/'
 
 GIT_CMD='D:/Program Files/Git/bin/git.exe'
 CONVERT_CMD='D:/Tools/dos2unix-7.3.2-win64/bin/dos2unix.exe'
+
+class ColorPrinter:
+    #copy from http://blog.csdn.net/five3/article/details/7630295
+    __STD_INPUT_HANDLE = -10  
+    __STD_OUTPUT_HANDLE= -11  
+    __STD_ERROR_HANDLE = -12  
+      
+    __FOREGROUND_BLACK = 0x0  
+    __FOREGROUND_BLUE = 0x01 # text color contains blue.  
+    __FOREGROUND_GREEN= 0x02 # text color contains green.  
+    __FOREGROUND_RED = 0x04 # text color contains red.  
+    __FOREGROUND_INTENSITY = 0x08 # text color is intensified.  
+      
+    __BACKGROUND_BLUE = 0x10 # background color contains blue.  
+    __BACKGROUND_GREEN= 0x20 # background color contains green.  
+    __BACKGROUND_RED = 0x40 # background color contains red.  
+    __BACKGROUND_INTENSITY = 0x80 # background color is intensified. 
+    
+    def __init__(self):
+        self.__std_out_handle = ctypes.windll.kernel32.GetStdHandle(self.__STD_OUTPUT_HANDLE) 
+        
+    def print_string(self, str):
+        ctypes.windll.kernel32.SetConsoleTextAttribute(self.__std_out_handle, self.__FOREGROUND_RED | self.__FOREGROUND_INTENSITY)
+        print str
+        ctypes.windll.kernel32.SetConsoleTextAttribute(self.__std_out_handle, self.__FOREGROUND_RED | self.__FOREGROUND_BLUE | self.__FOREGROUND_GREEN)
 
 class FtpClient:
     __host = ''
@@ -127,9 +153,11 @@ def getLocalModifiedFileList(projectName):
         
     print "Total modified %d files!" % len(list)
     index = 0
+    cp = ColorPrinter()
     for onefile in list:
         index = index + 1
-        print '%3d: %s' % (index, onefile)
+        str = '%3d: %s' % (index, onefile)
+        cp.print_string(str)
     return list
     
     
@@ -207,8 +235,8 @@ def processModifiedFileList(projectName, list):
     finally:
         ftp.disconnect()
     
-    
-    print 'Success to process modified files!'
+    cp = ColorPrinter()
+    cp.print_string('Success to process modified files!')
 
 def main(projectName):
     modifiedFileList = getLocalModifiedFileList(projectName)
